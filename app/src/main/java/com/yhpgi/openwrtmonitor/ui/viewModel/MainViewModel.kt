@@ -13,11 +13,14 @@ import com.google.gson.Gson
 import com.yhpgi.openwrtmonitor.domain.helper.repository.DataStoreRepository
 import com.yhpgi.openwrtmonitor.domain.helper.repository.MainRepository
 import com.yhpgi.openwrtmonitor.domain.model.ApiResponse
+import com.yhpgi.openwrtmonitor.domain.model.ResultExec
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 
 class MainViewModel(application: Application) : AndroidViewModel(application = application) {
 
@@ -25,6 +28,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application = a
 
     val savedThemeString by mutableStateOf(repository.getThemeString.asLiveData())
     val savedIpString by mutableStateOf(repository.getIPString.asLiveData())
+    val savedTokenString by mutableStateOf(repository.getTokenString.asLiveData())
     val savedLuciPathString by mutableStateOf(repository.getLuciPathString.asLiveData())
     val savedClashString by mutableStateOf(repository.getClashString.asLiveData())
     var luciConfigChanged by mutableStateOf(false)
@@ -79,23 +83,28 @@ class MainViewModel(application: Application) : AndroidViewModel(application = a
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val savedIpAddress = savedIpString.value
+                val savedToken = savedTokenString.value
                 val httpClient = OkHttpClient()
+
+                val json = """{"method":"exec", "params":["ubus call system board"]}""".trimIndent()
+
+                val requestBody = json.toRequestBody("application/json".toMediaType())
                 val request = Request.Builder()
-                    .url("http://$savedIpAddress/api.json")
+                    .url("http://$savedIpAddress/cgi-bin/luci/rpc/sys?auth=$savedToken")
+                    .post(requestBody)
                     .build()
+
                 val response = httpClient.newCall(request).execute()
                 if (response.isSuccessful) {
                     val responseString = response.body.string()
                     val gson = Gson()
                     val apiResponse = gson.fromJson(responseString, ApiResponse::class.java)
 
-                    val devices = apiResponse.data
-                    for (device in devices) {
-                        hostname = device.hostname
-                        model = device.model
-                        firmwareVersion = device.release.version
-                        kernelVersion = device.kernel
-                    }
+                    val result = gson.fromJson(apiResponse.result, ResultExec::class.java)
+                    hostname = result?.hostname.toString()
+                    model = result?.model.toString()
+                    firmwareVersion = result?.release?.version ?: "Unknown"
+                    kernelVersion = result?.kernel.toString()
                 } else {
                     hostname = MainRepository.STRING_DATA_NOT_FOUND
                     model = MainRepository.STRING_DATA_NOT_FOUND
