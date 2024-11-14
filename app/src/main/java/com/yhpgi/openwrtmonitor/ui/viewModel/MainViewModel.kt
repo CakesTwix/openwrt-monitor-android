@@ -14,6 +14,7 @@ import com.yhpgi.openwrtmonitor.domain.helper.repository.DataStoreRepository
 import com.yhpgi.openwrtmonitor.domain.helper.repository.MainRepository
 import com.yhpgi.openwrtmonitor.domain.model.ApiResponse
 import com.yhpgi.openwrtmonitor.domain.model.ResultExec
+import com.yhpgi.openwrtmonitor.network.AndroidCookieJar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -90,13 +91,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application = a
             try {
                 val savedIpAddress = savedIpString.value
                 val savedToken = savedTokenString.value
-                val httpClient = OkHttpClient()
+                val httpClient = OkHttpClient.Builder().cookieJar(AndroidCookieJar()).build()
 
                 val json = """{"method":"exec", "params":["ubus call system board"]}""".trimIndent()
 
                 val requestBody = json.toRequestBody("application/json".toMediaType())
                 val request = Request.Builder()
-                    .url("http://$savedIpAddress/cgi-bin/luci/rpc/sys?auth=$savedToken")
+                    .url("http://$savedIpAddress/cgi-bin/luci/rpc/sys")
                     .post(requestBody)
                     .build()
 
