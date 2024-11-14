@@ -54,6 +54,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application = a
             clashConfigChanged = true
         }
 
+    private fun saveTokenString(newToken: String) =
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.saveTokenString(newToken)
+            luciConfigChanged = true
+        }
+
     private fun saveLuciPathString(newLuciPathString: String) =
         viewModelScope.launch(Dispatchers.IO) {
             repository.saveLuciString(newLuciPathString)
@@ -146,6 +152,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application = a
                     0 -> saveIPString(newKeyValue)
                     1 -> saveLuciPathString(newKeyValue)
                     2 -> saveOpenClashString(newKeyValue)
+                    3 -> saveTokenString(newKeyValue)
                 }
             }
         }

@@ -56,7 +56,7 @@ fun SettingItemsGeneral(mainViewModel: MainViewModel, mainActivity: MainActivity
                     title = R.string.settings_auth_token,
                     description = R.string.settings_auth_token_description,
                     defaultValue = authToken,
-                    key = 0
+                    key = 3
                 )
             }
         )
