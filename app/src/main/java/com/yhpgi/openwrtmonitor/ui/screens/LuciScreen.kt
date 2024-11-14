@@ -95,7 +95,6 @@ fun LuciScreen(
                             contentDescription = "Back"
                         )
                     }
-
                 },
                 actions = {
                     Row {
@@ -131,25 +130,20 @@ fun LuciScreen(
                 .fillMaxSize()
                 .padding(it)
         ) {
-            Column(
-                modifier = Modifier.scrollable(rememberScrollState(), orientation = Orientation.Vertical)
-            ) {
-
-
-                val webClient = remember {
-                    object : AccompanistWebViewClient() {}
-                }
-
-                WebView(
-                    state = state,
-                    modifier = Modifier.fillMaxSize(),
-                    navigator = navigator,
-                    onCreated = { webView ->
-                        webView.settings.javaScriptEnabled = true
-                    },
-                    client = webClient
-                )
+            val webClient = remember {
+                object : AccompanistWebViewClient() {}
             }
+
+            WebView(
+                state = state,
+                modifier = Modifier.fillMaxSize(),
+                navigator = navigator,
+                onCreated = { webView ->
+                    webView.settings.javaScriptEnabled = true
+                },
+                client = webClient
+            )
+
             val loadingState = state.loadingState
             if (loadingState is LoadingState.Loading) {
                 LinearProgressIndicator(
@@ -162,4 +156,3 @@ fun LuciScreen(
         }
     }
 }
-
