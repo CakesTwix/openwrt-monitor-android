@@ -58,6 +58,27 @@ class DataStoreRepository(context: Context) {
         }
     }
 
+    val getTokenString: Flow<String> = dataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                Log.d(MainRepository.KEY_APP_SETTINGS, exception.message.toString())
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }
+        .map { preferences ->
+            val storedToken =
+                preferences[MainRepository.KEY_APP_TOKEN_STRING] ?: MainRepository.DEFAULT_TOKEN
+            storedToken
+        }
+
+    suspend fun saveTokenString(newToken: String) {
+        dataStore.edit { preferences ->
+            preferences[MainRepository.KEY_APP_TOKEN_STRING] = newToken
+        }
+    }
+
     val getLuciPathString: Flow<String> = dataStore.data
         .catch { exception ->
             if (exception is IOException) {

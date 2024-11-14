@@ -32,4 +32,6 @@
     <string name="device">Device :</string>
     <string name="firmware_version">Firmware Version :</string>
     <string name="kernel_version">Kernel Version :</string>
+    <string name="settings_auth_token">Auth Token</string>
+    <string name="settings_auth_token_description">Most exported libraries will require a valid authentication to be called with</string>
 </resources>

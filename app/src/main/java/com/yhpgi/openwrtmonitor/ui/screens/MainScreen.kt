@@ -107,6 +107,12 @@ fun MainScreen(
         mainViewModel.savedIpString.observe(mainActivity) {
             ipAddress = it
         }
+        var authToken by rememberSaveable {
+            mutableStateOf(MainRepository.DEFAULT_TOKEN)
+        }
+        mainViewModel.savedTokenString.observe(mainActivity) {
+            authToken = it
+        }
         var luciPath by rememberSaveable {
             mutableStateOf(MainRepository.DEFAULT_LUCI_PATH)
         }

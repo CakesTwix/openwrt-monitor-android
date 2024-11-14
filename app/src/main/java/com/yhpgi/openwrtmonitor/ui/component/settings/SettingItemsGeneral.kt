@@ -39,6 +39,28 @@ fun SettingItemsGeneral(mainViewModel: MainViewModel, mainActivity: MainActivity
             }
         )
 
+        var authToken by rememberSaveable {
+            mutableStateOf(MainRepository.DEFAULT_TOKEN)
+        }
+        mainViewModel.savedTokenString.observe(mainActivity) {
+            authToken = it
+        }
+
+        SettingItem(
+            icon = Icons.TwoTone.AccountCircle,
+            title = stringResource(R.string.settings_auth_token),
+            description = stringResource(R.string.settings_auth_token_description),
+            savedValue = authToken,
+            onClick = {
+                mainViewModel.openEditTextDialog(
+                    title = R.string.settings_auth_token,
+                    description = R.string.settings_auth_token_description,
+                    defaultValue = authToken,
+                    key = 0
+                )
+            }
+        )
+
         var defaultLuciPath by rememberSaveable {
             mutableStateOf(MainRepository.DEFAULT_LUCI_PATH)
         }
